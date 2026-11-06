@@ -6,9 +6,9 @@ A Zenless Zone Zero style toon shader for player models and NPCs in Garry's Mod.
 
 ## Install
 
-Run `install_to_gmod.bat`, or copy the contents of `addon/` into your `garrysmod` folder. Then restart GMod.
+Download `zzz_shader` from [Releases](../../releases), extract it into `garrysmod/addons/` and restart GMod.
 
-The installer looks for GMod in Steam's default library. For another location, pass the `garrysmod` folder as an argument: `install_to_gmod.bat "D:\SteamLibrary\steamapps\common\GarrysMod\garrysmod"`.
+From a clone of this repository, run `install_to_gmod.bat` instead. It looks for GMod in Steam's default library; for another location, pass the `garrysmod` folder: `install_to_gmod.bat "D:\SteamLibrary\steamapps\common\GarrysMod\garrysmod"`.
 
 ## Set up a model
 
