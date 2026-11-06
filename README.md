@@ -14,6 +14,20 @@ From a clone of this repository, run `install_to_gmod.bat` instead. It looks for
 
 Every material on the model must use this shader. Mixing in normal (VertexLitGeneric) materials breaks the rest of the model.
 
+### Import from a game export
+
+`tools/zzz_import.py` does everything below in one step from a character export (the zip with `Materials/*.json` and `Textures/*.png`): converts the textures, bakes ramps and glow maps, and writes a VMT per material with the game's values.
+
+```
+python tools/zzz_import.py "Harumasa - Default.zip" "<addon>/materials/<model path>" --rename body_1=body,body_2=body2 --dry-run
+```
+
+- Game materials are named after their part (`MAT_Harumasa_Body_1_UI.json` → `body_1`). Use `--rename` to match the model's own material names.
+- `--dry-run` lists what would be written. Existing files are kept unless you add `--overwrite`.
+- It lists the model's materials it couldn't cover. Eyes and other extra materials still need converting by hand.
+
+Requires Python with Pillow and numpy.
+
 ### Body, hair and other parts
 
 Copy `addon/materials/models/zzz/zzz_body_template.vmt` over the model's material and set its textures:
@@ -49,6 +63,16 @@ python tools/zzz_ramp_from_json.py "Character.zip" body_ramp.vtf --member MAT_An
 ```
 
 Make one ramp each for body, hair, face and weapon, and point that material's `$texture4` at it. `--print` also lists proxy keys to copy into the VMT. Add `--soft 0.2 --edge 0.2` for softer shading bands, or `--game` for the game's sharper ones.
+
+### Glow (emission)
+
+Glowing parts (light strips, screens) are baked into an emission texture from the same JSON:
+
+```
+python tools/zzz_emission_from_json.py "Character.zip" weapon_e.vtf --member MAT_Harumasa_Weapon_UI.json --textures Harumasa_Weapon
+```
+
+`--textures` is the texture name prefix (`<prefix>_D.png`, `_M.png` and `_A.png` are read). Set `$texture7` to the result and `emissionscale` to the value it prints. Materials that don't glow are skipped.
 
 ### Transparency
 

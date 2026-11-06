@@ -93,6 +93,7 @@ Constants are used verbatim. 0 is a meaningful value, so don't add "if 0 use def
 - **Ramp data rows** (numbers in alpha, because RGB is read as sRGB and alpha is always linear): row 5 = specular colour, A = `_ToonSpecular` × 4; row 6 = outline colour / 2, A = `_SpecularRange` / 4; row 7 A = 10 bins, `_MatCapColorBurst` / 4 for slots 1–5 then `_MatCapAlphaBurst` / 4. Ramps baked before this layout have alpha 255 and will read as huge values: rebake them.
 - **Matcap:** masked by LightMap.G (`_UseMatCapMask`). Colour = matcap.rgb × colour burst, weight = saturate(matcap.a × alpha burst) × LightMap.G × strength, blended by `matcapmode`. *The meaning of `_MatCapBlendMode` values is a guess (0 replace, 1 add, 2 multiply); nothing public documents it.*
 - **Specular:** stepped Blinn. **LightMap.B is the highlight amount, not a tightness**: 0 = no highlight (`smoothstep(0, 0.25, B)`). On Anby's hair B is 0 except for painted shine marks (H-shaped arcs), and MaterialMap.B is 255 everywhere, so B is what places the shine. An earlier version used B as the exponent, which gave 0 the widest highlight: the whole hair got a broad highlight and the shine marks a tiny one (visible as the shine looking dimmer than the rest of the hair). The size is a separate power, `zzz_spec_power` / `specpower` (c1.w), divided by `_SpecularRange`; `_ToonSpecular` is the smoothstep half-width. MaterialMap.B masks it, MaterialMap.G tints it by albedo.
+- **Emission in the game:** no emission texture. A material glows when its JSON has `_Emission 1`; each slot has an HDR `_EmissionColorN`, and MaterialMap.B (pure white) marks the glowing pixels, coloured by the diffuse. Unused slots default to (1,1,1) in materials with emission off, so `_Emission` is the switch. Verified on Harumasa: the weapons' light strips glow, and Body 1 has a single small yellow indicator light (0.01% of its texture). `tools/zzz_emission_from_json.py` bakes this into the `_E` texture (`$texture7`): RGB = diffuse × slot colour / brightest, A = near-white MaterialMap.B in emissive slots (mid-greys are the specular mask), and prints `emissionscale` = the brightest slot colour.
 - **Rim:** (1 − N·V)^`_FresnelWidth` on the lit side. Treating the width as a power is also a guess. Emission is unlit.
 
 ## 4b. Shading model (face)
@@ -107,6 +108,13 @@ Constants are used verbatim. 0 is a meaningful value, so don't add "if 0 use def
 - The final cel value is a lerp between the normal-based cel and the face-map cel by `A × faceshadow`. It maps to ramp U = lerp(0.375, 1, cel), so a shadowed face sits in the shallow band and never reaches deep shadow, on ramp row `ramprow`.
 - **Head vectors** come from the head bone matrix. The bone axes that point forward and right are auto-detected once per model, by picking the bone axis best aligned with `ent:GetForward()` / `ent:GetRight()`. Use the `zzz_face_recalibrate` command or the proxy keys `headforward` / `headright` if a rig gets it wrong, and `flipfacemap 1` if the face map's UVs are mirrored.
 - Convert face maps with `tools/png_to_vtf.py <png> <vtf> --clamp`, and read them with `$linearread_texture1 1`.
+
+## 4c. Importing a character (`tools/zzz_import.py`)
+
+- The game JSON's `m_TexEnvs` name each material's textures: `_MainTex` = diffuse, `_OtherDataTex` = light map (`_M`), `_OtherDataTex2` = material map (`_A`), `_LightTex` = normal map (`_N`), or the face shadow map on `NapAvatarUIFace`. `_MatCapTex` is used when `_MatCap` is on.
+- Normal maps are converted for Source: green flipped (Unity is OpenGL-style) and blue set to 255. The game stores about 0.5 in blue, which the shader would read as half occlusion. This matches the hand-made `*_n2` maps used for Anby.
+- `NapAvatarUITransparent` gets `alphamode 2` + `$alpha_blend 1`. `NapAvatarUIEye` and `NapStencilShadowCaster` are skipped.
+- It reuses `zzz_ramp_from_json.build`, `zzz_emission_from_json.build` and `png_to_vtf.write_vtf` (which accepts a PIL image).
 
 ## 5. Build, deploy, test
 

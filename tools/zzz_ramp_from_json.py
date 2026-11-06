@@ -183,7 +183,7 @@ def build(mat, print_slots=False, soft=None, edge=None):
     return rows
 
 
-def write_vtf(rows, dst):
+def write_vtf(rows, dst, quiet=False):
     data = bytearray()
     for row in rows:
         for (r, g, b, a) in row:
@@ -195,7 +195,8 @@ def write_vtf(rows, dst):
     os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
     with open(dst, "wb") as f:
         f.write(header + data)
-    print(f"wrote {dst}")
+    if not quiet:
+        print(f"wrote {dst}")
 
 
 if __name__ == "__main__":

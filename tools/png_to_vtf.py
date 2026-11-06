@@ -27,8 +27,11 @@ def to_bgra(img):
     return Image.merge("RGBA", (b, g, r, a)).tobytes()
 
 
-def write_vtf(src, dst, clamp=False, mips=True):
-    img = Image.open(src).convert("RGBA")
+def write_vtf(src, dst, clamp=False, mips=True, quiet=False):
+    """src: an image path, or a PIL image (used by the other tools)."""
+    img = src.convert("RGBA") if isinstance(src, Image.Image) else Image.open(src).convert("RGBA")
+    if isinstance(src, Image.Image):
+        src = "image"
     w, h = img.size
     if w & (w - 1) or h & (h - 1):
         raise SystemExit(f"{src}: size {w}x{h} is not a power of two")
@@ -55,7 +58,8 @@ def write_vtf(src, dst, clamp=False, mips=True):
         f.write(header)
         for level in reversed(levels):    # VTF stores the smallest mip first
             f.write(to_bgra(level))
-    print(f"{src} -> {dst} ({w}x{h}, {len(levels)} mip levels)")
+    if not quiet:
+        print(f"{src} -> {dst} ({w}x{h}, {len(levels)} mip levels)")
 
 
 if __name__ == "__main__":
