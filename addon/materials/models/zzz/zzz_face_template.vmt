@@ -1,0 +1,47 @@
+// ZZZ face material template. The face is lit by a face shadow map (e.g. Female_Face_Lightmap),
+// not by its normals. Convert the map with:
+//   python tools/png_to_vtf.py Female_Face_Lightmap.png <materials>/<model>/face_lightmap.vtf --clamp
+// Without $texture1 the face falls back to plain normal-based cel shading.
+screenspace_general_8tex
+{
+	$pixshader            "zzz_face_ps30"
+	$vertexshader         "zzz_body_vs30"
+
+	$basetexture          "models/zzz/template/face_d"          // face _D (sRGB)
+	$texture1             "models/zzz/template/face_lightmap"   // face shadow map: R threshold, B nose line, A mask
+	$texture4             "models/zzz/common/toon_ramp"
+
+	$linearread_texture1  1    // the face map is data, not colour
+
+	$model                1
+	$cull                 1
+	$vertexnormal         1
+
+	Proxies
+	{
+		ZZZ
+		{
+			// All optional; defaults shown
+			intensity       1
+			//maxlight      1      // soft cap on light brightness for this material (0 = off, overrides zzz_max_light)
+			shadowstrength  1
+			faceshadow      1      // 0 = ignore the face map, use normals
+			noseline        1      // nose line strength (face map B)
+			noselineside    0.8522 // game _NoseLineHoriDisp: shown when the camera is this far to the side (cos)
+			noselinedown    0.62   // game _NoseLineLkDnDisp: or this far above the face (cos)
+			ramprow         0      // which toon ramp row the face uses (0-4)
+			rimstrength     0      // faces usually have no rim
+			rimwidth        3.5
+			alphamode       0      // 0 opaque, 1 diffuse alpha (cutout)
+			outline         1
+			colortint       "[1 1 1]"
+
+			// Head tracking. Axes are auto-detected per model; set these only if the shadow
+			// moves the wrong way ("x", "-x", "y", "-y", "z", "-z" of the head bone matrix).
+			headbone        "ValveBiped.Bip01_Head1"
+			//headforward   "-y"
+			//headright     "x"
+			flipfacemap     0      // 1 if the lit side is mirrored (light on the right lights the left)
+		}
+	}
+}

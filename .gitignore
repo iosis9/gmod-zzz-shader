@@ -1,0 +1,29 @@
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Temporary compiler artifacts
+shaders/shaders/
+*.tmp
+*.log
+
+# Intermediate build copy (addon/shaders/fxc is the canonical tracked output)
+shaders/fxc/
+__pycache__/
+
+
+# Local dev material (ExoPBR disassembly, SDK copies, texture dumps): not for the public repo
+reference/
+
+# Local packaged test builds (never commit: they contain third-party models and textures)
+dist/
+
+# Local GMod path for install_to_gmod.bat
+install_config.local.bat
+
+# Valve's shader compiler and Source SDK headers: not redistributed, see README (Build and install)
+shaders/ShaderCompile.exe
+shaders/common_*.h

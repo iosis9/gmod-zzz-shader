@@ -1,0 +1,50 @@
+// ZZZ body / hair material template. Copy per model material and point the textures at the extracted ZZZ maps.
+// Only $basetexture is required; missing slots fall back to neutral textures from models/zzz/common.
+screenspace_general_8tex
+{
+	$pixshader            "zzz_body_ps30"
+	$vertexshader         "zzz_body_vs30"
+
+	$basetexture          "models/zzz/template/body_d"   // _D  Diffuse (sRGB)
+	$texture1             "models/zzz/template/body_m"   // _M  LightMap: R ramp region, G metallic, B gloss
+	$texture2             "models/zzz/template/body_n"   // _N  NormalMap: RG normal, B occlusion
+	$texture3             "models/zzz/template/body_a"   // _A  MaterialMap: R transparency, G spec tint, B specular
+	$texture4             "models/zzz/common/toon_ramp"  // slot ramp, bake per material with tools/zzz_ramp_from_json.py
+	$texture5             "models/zzz/common/metal_matcap" // or the game's matcap (e.g. Eff_MatCap_007), masked by _M.G
+	//$texture7           "models/zzz/template/body_e"   // optional emission (RGB colour, A mask)
+
+	// _M, _N and _A are data, not colour
+	$linearread_texture1  1
+	$linearread_texture2  1
+	$linearread_texture3  1
+
+	// Same model setup ExoPBR uses: hardware skinning + flexes, no $softwareskin
+	$model                1
+	$cull                 1
+	$vertexnormal         1
+
+	// Transparent parts (alphamode 2, e.g. glass): without this the alpha is ignored and it stays opaque
+	//$alpha_blend        1
+
+	Proxies
+	{
+		ZZZ
+		{
+			// All optional; defaults shown
+			intensity       1
+			//maxlight      1      // soft cap on light brightness for this material (0 = off, overrides zzz_max_light)
+			shadowstrength  1
+			rimstrength     1
+			specstrength    1
+			//specpower    16     // highlight size, higher = smaller (overrides zzz_spec_power)
+			matcapstrength  1
+			matcapmode      0      // 0 replace, 1 add, 2 multiply (game _MatCapBlendMode; ZZZ bodies use 2)
+			rimwidth        3.5    // fresnel power (game _FresnelWidth); higher = thinner rim
+			emissionscale   1
+			alphamode       0      // 0 opaque, 1 diffuse alpha (cutout), 2 MaterialMap.R (needs $alpha_blend 1)
+			outline         1      // 0 = no outline for this material
+			colortint       "[1 1 1]"
+			emissiontint    "[1 1 1]"
+		}
+	}
+}
