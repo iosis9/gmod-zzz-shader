@@ -1,5 +1,7 @@
 # ZZZ Shader for Garry's Mod
 
+> This project uses AI generated code.
+
 A Zenless Zone Zero–style NPR character shader for Garry's Mod, built on `screenspace_general_8tex` with custom SM3.0 shaders. It uses the real ZZZ texture layout and takes its lighting from the engine, so the model reacts to the map's lights and fog.
 
 Built from these references:
